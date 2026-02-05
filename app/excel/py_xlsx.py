@@ -1,24 +1,21 @@
 import pandas as pd
 from pathlib import Path
 from typing import Dict, Any, List, Optional
-from openpyxl.styles import Alignment
+from openpyxl.styles import Alignment, Font
+from openpyxl.utils import get_column_letter
 from datetime import datetime
+import shutil
+import os
 
-FIELD_NAMES = {
-    "name": "Наименование",
-    "rate": "% Ставка", 
-    "sum": "Сумма",
-    "term": "Срок",
-    "commission": "Комиссия",
-    "additional": "Дополнительно",
-}
+from config import FIELD_NAMES
 
 FIELD_ORDER = list(FIELD_NAMES.keys())
 
 def create_bank_excel_report(
     results: List[Dict[str, Any]], 
     output_dir: str = "./",
-    selected_characteristics: Optional[List[str]] = None
+    selected_characteristics: Optional[List[str]] = None,
+    pdf_path: Optional[str] = None  # Параметр для PDF-файла
 ) -> str:
 
     # Если характеристики не указаны, используем все
@@ -64,6 +61,28 @@ def create_bank_excel_report(
         df.to_excel(writer, sheet_name='Карты банков', index=False)
         
         worksheet = writer.sheets['Карты банков']
+        
+        # Добавляем PDF-файл если он указан
+        if pdf_path and os.path.exists(pdf_path):
+            pdf_filename = os.path.basename(pdf_path)
+            
+            # Копируем PDF в папку рядом с Excel
+            output_pdf_path = filepath.parent / pdf_filename
+            shutil.copy(pdf_path, output_pdf_path)
+            
+            # Добавляем строку с ссылкой на PDF (после таблицы)
+            pdf_row = len(df) + 3
+            worksheet[f'A{pdf_row}'] = "📎 Документ:"
+            worksheet[f'B{pdf_row}'] = pdf_filename
+            
+            # Делаем гиперссылку на PDF
+            cell = worksheet[f'B{pdf_row}']
+            cell.hyperlink = pdf_filename
+            cell.font = Font(color="0563C1", underline="single")
+            
+            # Форматирование
+            worksheet[f'A{pdf_row}'].font = Font(bold=True)
+        
         for row in worksheet.iter_rows():
             for cell in row:
                 cell.alignment = Alignment(wrap_text=True, vertical='top')

@@ -9,12 +9,24 @@ Base = declarative_base()
 
 FIELD_NAMES = {
     "name": "Наименование",
-    "rate": "% Ставка", 
+
+    "rate": "% Ставка",
+    "rate_type": "Тип ставки",
+
     "sum": "Сумма",
     "term": "Срок",
-    "commission": "Комиссия",
+
+    "payment_type": "Тип платежа",
+    "commission": "Комиссии",
+
+    "early_repayment": "Досрочное погашение",
+    "insurance": "Страхование",
+
+    "currency": "Валюта",
+
     "additional": "Дополнительно",
 }
+
 
 class User(Base):
     __tablename__ = "users"
@@ -39,6 +51,7 @@ class Log(Base):
     action = Column(String(50))
     status = Column(String(50))
     message = Column(Text, nullable=True)
+    token = Column(Integer, index=True)
 
 class Bank(Base):
     __tablename__ = "banks"
@@ -105,11 +118,23 @@ def migrate_characteristics():
     db = SessionLocal()
     chars_to_add = [
         ("name", "Наименование"),
+
         ("rate", "% Ставка"),
+        ("rate_type", "Тип ставки"),
+
         ("sum", "Сумма"),
         ("term", "Срок"),
-        ("commission", "Комиссия"),
+
+        ("payment_type", "Тип платежа"),
+        ("commission", "Комиссии"),
+
+        ("early_repayment", "Досрочное погашение"),
+        ("insurance", "Страхование"),
+
+        ("currency", "Валюта"),
+
         ("additional", "Дополнительно"),
+        ("files", "Файлы"),
     ]
     added = 0
     for name, desc in chars_to_add:
@@ -131,17 +156,17 @@ def migrate_products():
     # Продукты для каждого набора
     products_data = {
         "Кредиты": [
-            ("Сбер", "SberCard", "https://www.sber-bank.by/credit-potreb/prosto-v-online/conditions"),
-            ("Альфа Банк", "Alfa Classic", "https://www.alfabank.by/credits/cards/installment-card/"),
-            ("Беларусбанк", "Щедрая Mastercard", "https://belarusbank.by/fizicheskim_licam/kredit/consumer/kredit-1/"),
-            ("МТБанк", "Cactus", "https://www.mtbank.by/credits/proshche-prostogo/"),
-            ("Приорбанк", "Яркая карта", "https://www.priorbank.by/offers/credits/universal-credit/kredit-online"),
-            ("БНБ", "1-2-3", "https://bnb.by/o-lichnom/kreditovanie-i-lizing/match/"),
-            ("ВТБ", "VTB Card", "https://www.vtb.by/chastnym-licam/kredity/kredit-start"),
-            ("Белгазпромбанк", "Classic Card", "https://belgazprombank.by/personal_banking/krediti/kredit_na_potrebitel_skie_nuzhdi/credit_cashalot/"),
-            ("Белагропромбанк", "Пакет Лайт", "https://www.belapb.by/chastnomu-klientu/kredity/kredit-na-raz/"),
-            ("БелВэб", "Simple", "https://www.belveb.by/credits/potrebitelskiy-bel/"),
-            ("Дабрабыт", "Спра-ная", "https://bankdabrabyt.by/personal/credit/potrebitelskiy-kredit-nalichnoe/"),
+            ("Сбер", "«Просто в Online» (Сбер)", "https://www.sber-bank.by/credit-potreb/prosto-v-online/conditions"),
+            ("Альфа Банк", "Красная карта (Альфа)", "https://www.alfabank.by/credits/cards/installment-card/"),
+            ("Беларусбанк", "Потребительский (Беларус)", "https://belarusbank.by/fizicheskim_licam/kredit/consumer/kredit-1/"),
+            ("МТБанк", '"Проще простого" (МТБанк)', "https://www.mtbank.by/credits/proshche-prostogo/"),
+            ("Приорбанк", '"Проще.net" (Приор)', "https://www.priorbank.by/offers/credits/universal-credit/kredit-online"),
+            ("БНБ", '"Мэтч" (БНБ)', "https://bnb.by/o-lichnom/kreditovanie-i-lizing/match/"),
+            ("ВТБ", "«Старт» (ВТБ)", "https://www.vtb.by/chastnym-licam/kredity/kredit-start"),
+            ("Белгазпромбанк", "Cashalot (Белгаз)", "https://belgazprombank.by/personal_banking/krediti/kredit_na_potrebitel_skie_nuzhdi/credit_cashalot/"),
+            ("Белагропромбанк", "«На раз» (Белагро)", "https://www.belapb.by/chastnomu-klientu/kredity/kredit-na-raz/"),
+            ("БелВэб", "Потребительский (БелВэб)", "https://www.belveb.by/credits/potrebitelskiy-bel/"),
+            ("Дабрабыт", '"На ЛИЧНОЕ" (Дабрабыт)', "https://bankdabrabyt.by/personal/credit/potrebitelskiy-kredit-nalichnoe/"),
         ],
         "Депозиты": [
             ("Сбер", "SberCard", "https://www.sber-bank.by/credit-potreb/prosto-v-online/conditions"),
